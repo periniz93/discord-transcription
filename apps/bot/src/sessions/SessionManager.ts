@@ -1,12 +1,36 @@
 import { Session, SessionState, Segment } from '@discord-transcribe/shared';
 import { VoiceConnection } from '@discordjs/voice';
 import { v4 as uuidv4 } from 'uuid';
+import { SessionPersistence } from './SessionPersistence';
 
 export class SessionManager {
   private static readonly MAX_GLOSSARY_TERM_LENGTH = 80;
   private sessions: Map<string, Session> = new Map();
   private voiceConnections: Map<string, VoiceConnection> = new Map();
   private segments: Map<string, Segment[]> = new Map(); // sessionId -> segments
+  private persistence?: SessionPersistence;
+
+  setPersistence(persistence: SessionPersistence): void {
+    this.persistence = persistence;
+  }
+
+  async loadFromPersistence(persistence: SessionPersistence): Promise<void> {
+    this.persistence = persistence;
+    const { sessions, segmentsBySession } = await persistence.loadSessions();
+
+    for (const session of sessions) {
+      if (session.state === SessionState.RECORDING) {
+        session.state = SessionState.STOPPING;
+        session.endedAt = Date.now();
+      }
+      this.sessions.set(session.sessionId, session);
+      this.persistSession(session);
+    }
+
+    for (const [sessionId, segments] of segmentsBySession.entries()) {
+      this.segments.set(sessionId, segments);
+    }
+  }
 
   createSession(
     guildId: string,
@@ -27,6 +51,7 @@ export class SessionManager {
 
     this.sessions.set(sessionId, session);
     this.segments.set(sessionId, []);
+    this.persistSession(session);
 
     return session;
   }
@@ -49,6 +74,7 @@ export class SessionManager {
     const session = this.sessions.get(sessionId);
     if (session) {
       session.state = state;
+      this.persistSession(session);
     }
   }
 
@@ -60,6 +86,7 @@ export class SessionManager {
         displayName,
         consented,
       });
+      this.persistSession(session);
     }
   }
 
@@ -67,6 +94,7 @@ export class SessionManager {
     const session = this.sessions.get(sessionId);
     if (session) {
       session.participants.delete(userId);
+      this.persistSession(session);
     }
   }
 
@@ -107,6 +135,7 @@ export class SessionManager {
     }
 
     session.glossary.push(normalized);
+    this.persistSession(session);
     return { status: 'added', term: normalized };
   }
 
@@ -119,6 +148,7 @@ export class SessionManager {
     const segments = this.segments.get(sessionId);
     if (segments) {
       segments.push(segment);
+      this.persistSegments(sessionId, segments);
     }
   }
 
@@ -139,6 +169,7 @@ export class SessionManager {
     if (session) {
       session.endedAt = Date.now();
       session.state = SessionState.STOPPING;
+      this.persistSession(session);
 
       // Clean up voice connection
       const connection = this.voiceConnections.get(sessionId);
@@ -153,5 +184,25 @@ export class SessionManager {
     this.sessions.delete(sessionId);
     this.segments.delete(sessionId);
     this.voiceConnections.delete(sessionId);
+  }
+
+  private persistSession(session: Session): void {
+    if (!this.persistence) {
+      return;
+    }
+
+    this.persistence.saveSession(session).catch(error => {
+      console.error(`Failed to persist session ${session.sessionId}:`, error);
+    });
+  }
+
+  private persistSegments(sessionId: string, segments: Segment[]): void {
+    if (!this.persistence) {
+      return;
+    }
+
+    this.persistence.saveSegments(sessionId, segments).catch(error => {
+      console.error(`Failed to persist segments for session ${sessionId}:`, error);
+    });
   }
 }

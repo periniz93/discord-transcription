@@ -1,5 +1,5 @@
 import { Client, AttachmentBuilder } from 'discord.js';
-import { Session } from '@discord-transcribe/shared';
+import { Session, formatDuration } from '@discord-transcribe/shared';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import { StorageManager } from './StorageManager';
@@ -64,11 +64,10 @@ export class TranscriptDelivery {
 
       // Deliver
       const duration = session.endedAt! - session.startedAt;
-      const minutes = Math.floor(duration / 60000);
-      const seconds = Math.floor((duration % 60000) / 1000);
+      const durationLabel = formatDuration(duration);
 
       await channel.send({
-        content: `✅ **Transcript Ready**\n\nSession: \`${session.sessionId}\`\nDuration: ${minutes}m ${seconds}s\nParticipants: ${session.participants.size}`,
+        content: `✅ **Transcript Ready**\n\nSession: \`${session.sessionId}\`\nDuration: ${durationLabel}\nParticipants: ${session.participants.size}`,
         files: attachments,
       });
 

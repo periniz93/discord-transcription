@@ -70,6 +70,10 @@ Transcripts will be saved to `./data/transcripts/<session-id>/` without being po
 - `/glossary-show` - Show current glossary
 - `/session-delete <session_id>` - Delete session data
 
+### Glossary Examples
+
+See `docs/example-glossary.md` for a ready-to-use starter list.
+
 ## Testing
 
 Run the test suite:

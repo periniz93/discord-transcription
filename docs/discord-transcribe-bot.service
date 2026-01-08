@@ -1,0 +1,28 @@
+[Unit]
+Description=Discord Multi-Track Transcription Bot
+After=network.target
+
+[Service]
+Type=simple
+User=discord-bot
+WorkingDirectory=/opt/discord-transcribe-bot
+ExecStart=/usr/bin/node /opt/discord-transcribe-bot/apps/bot/dist/index.js
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=discord-transcribe-bot
+
+# Environment
+Environment="NODE_ENV=production"
+EnvironmentFile=/opt/discord-transcribe-bot/.env
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/discord-transcribe-bot/data
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+data/
+*.log
+*.wav
+*.flac
+*.opus
+.DS_Store

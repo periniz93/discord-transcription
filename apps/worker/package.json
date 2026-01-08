@@ -1,0 +1,25 @@
+{
+  "name": "@discord-transcribe/worker",
+  "version": "1.0.0",
+  "description": "Transcription worker service",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@discord-transcribe/shared": "*",
+    "axios": "^1.6.5",
+    "form-data": "^4.0.0",
+    "dotenv": "^16.3.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0"
+  }
+}

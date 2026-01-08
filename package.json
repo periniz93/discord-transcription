@@ -1,0 +1,28 @@
+{
+  "name": "discord-transcribe-bot",
+  "version": "1.0.0",
+  "description": "Multi-track Discord voice transcription bot with speaker attribution",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "bot": "npm run start --workspace=apps/bot",
+    "worker": "npm run start --workspace=apps/worker",
+    "build": "npm run build --workspaces",
+    "dev": "npm run dev --workspace=apps/bot",
+    "test": "npm run test --workspaces --if-present",
+    "test:watch": "npm run test:watch --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.3.3",
+    "tsx": "^4.7.0",
+    "vitest": "^1.2.0",
+    "@vitest/ui": "^1.2.0"
+  }
+}

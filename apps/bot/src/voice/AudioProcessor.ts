@@ -39,13 +39,20 @@ export class AudioProcessor {
 
     // Decode Opus to PCM
     await new Promise<void>((resolve, reject) => {
+      const handleError = (error: Error) => {
+        reject(error);
+      };
+
+      opusStream.on('error', handleError);
+      decoder.on('error', handleError);
+
       opusStream
         .pipe(decoder)
         .on('data', (chunk: Buffer) => {
           chunks.push(chunk);
         })
         .on('end', resolve)
-        .on('error', reject);
+        .on('error', handleError);
     });
 
     // Concatenate all PCM data

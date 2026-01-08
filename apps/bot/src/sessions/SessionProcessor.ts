@@ -4,6 +4,7 @@ import { StorageManager } from '../storage/StorageManager';
 import { TranscriptDelivery } from '../storage/TranscriptDelivery';
 import { TranscriptionWorker } from '@discord-transcribe/worker';
 import { Client } from 'discord.js';
+import { Telemetry } from '../monitoring/Telemetry';
 
 export class SessionProcessor {
   private sessionManager: SessionManager;
@@ -34,6 +35,10 @@ export class SessionProcessor {
     }
 
     try {
+      void Telemetry.record('transcription_started', {
+        sessionId: session.sessionId,
+        segmentCount: segments.length,
+      });
       // Update state
       this.sessionManager.updateSessionState(sessionId, SessionState.TRANSCRIBING);
 
@@ -78,8 +83,16 @@ export class SessionProcessor {
       this.sessionManager.updateSessionState(sessionId, SessionState.IDLE);
 
       console.log(`Session ${sessionId} processing complete`);
+      void Telemetry.record('transcription_completed', {
+        sessionId: session.sessionId,
+        segmentCount: segments.length,
+      });
     } catch (error) {
       console.error(`Error processing session ${sessionId}:`, error);
+      void Telemetry.record('transcription_failed', {
+        sessionId: session.sessionId,
+        error: error instanceof Error ? error.message : String(error),
+      });
       this.sessionManager.updateSessionState(sessionId, SessionState.ERROR);
       throw error;
     }

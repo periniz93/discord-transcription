@@ -1,4 +1,4 @@
-import { Session, SessionState, Participant, Segment } from '@discord-transcribe/shared';
+import { Session, SessionState, Segment } from '@discord-transcribe/shared';
 import { VoiceConnection } from '@discordjs/voice';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -72,6 +72,7 @@ export class SessionManager {
 
   static normalizeGlossaryTerm(term: string): string | null {
     const cleaned = term
+      // eslint-disable-next-line no-control-regex
       .replace(/[\u0000-\u001F\u007F]/g, '')
       .replace(/\s+/g, ' ')
       .trim();

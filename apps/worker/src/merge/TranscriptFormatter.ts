@@ -23,7 +23,7 @@ export class TranscriptFormatter {
     }
 
     const participantNames = Array.from(session.participants.values())
-      .map((p: any) => p.displayName)
+      .map(p => p.displayName)
       .join(', ');
     lines.push(`**Participants:** ${participantNames}`);
     lines.push('');

@@ -2,7 +2,6 @@ import {
   VoiceConnection,
   VoiceReceiver,
   EndBehaviorType,
-  getVoiceConnection,
 } from '@discordjs/voice';
 import { Session, Segment, config } from '@discord-transcribe/shared';
 import { SessionManager } from '../sessions/SessionManager';
@@ -12,10 +11,7 @@ import { RingBuffer } from './RingBuffer';
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import { promises as fs } from 'fs';
-import { pipeline } from 'stream';
-import { promisify } from 'util';
-
-const pipelineAsync = promisify(pipeline);
+import prism from 'prism-media';
 
 interface ActiveSegment {
   segmentId: string;
@@ -96,7 +92,7 @@ export class VoiceRecorder {
     });
 
     // Decode and feed to ring buffer
-    const decoder = new (require('prism-media').opus.Decoder)({
+    const decoder = new prism.opus.Decoder({
       rate: config.audio.sampleRate,
       channels: config.audio.channels,
       frameSize: 960,

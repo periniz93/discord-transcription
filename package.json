@@ -13,13 +13,22 @@
     "build": "npm run build --workspaces",
     "dev": "npm run dev --workspace=apps/bot",
     "test": "npm run test --workspaces --if-present",
-    "test:watch": "npm run test:watch --workspaces --if-present"
+    "test:watch": "npm run test:watch --workspaces --if-present",
+    "lint": "eslint \"apps/**/*.ts\" \"packages/**/*.ts\"",
+    "lint:fix": "eslint \"apps/**/*.ts\" \"packages/**/*.ts\" --fix",
+    "format": "prettier \"**/*.{ts,md,json,yml,yaml}\" --write",
+    "format:check": "prettier \"**/*.{ts,md,json,yml,yaml}\" --check"
   },
   "engines": {
     "node": ">=22.12.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.3",
     "typescript": "^5.3.3",
     "tsx": "^4.7.0",
     "vitest": "^1.2.0",

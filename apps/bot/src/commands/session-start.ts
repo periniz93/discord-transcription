@@ -4,7 +4,12 @@ import {
   GuildMember,
   PermissionFlagsBits,
 } from 'discord.js';
-import { joinVoiceChannel, VoiceConnectionStatus, entersState } from '@discordjs/voice';
+import {
+  joinVoiceChannel,
+  VoiceConnectionStatus,
+  entersState,
+  DiscordGatewayAdapterCreator,
+} from '@discordjs/voice';
 import { SessionState } from '@discord-transcribe/shared';
 import { Command, CommandContext } from './index';
 import { VoiceRecorder } from '../voice/VoiceRecorder';
@@ -95,7 +100,7 @@ export const sessionStartCommand: Command = {
       const connection = joinVoiceChannel({
         channelId: voiceChannel.id,
         guildId: guildId,
-        adapterCreator: voiceChannel.guild.voiceAdapterCreator as any,
+        adapterCreator: voiceChannel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator,
         selfDeaf: false,
         selfMute: true,
       });

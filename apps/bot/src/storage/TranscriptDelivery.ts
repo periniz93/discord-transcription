@@ -1,4 +1,4 @@
-import { Client, TextChannel, AttachmentBuilder } from 'discord.js';
+import { Client, AttachmentBuilder } from 'discord.js';
 import { Session } from '@discord-transcribe/shared';
 import { promises as fs } from 'fs';
 import * as path from 'path';

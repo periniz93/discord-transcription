@@ -1,11 +1,7 @@
-import { Transform, Readable, Writable } from 'stream';
+import { Readable } from 'stream';
 import { createWriteStream } from 'fs';
-import { pipeline } from 'stream';
-import { promisify } from 'util';
 import prism from 'prism-media';
 import { config } from '@discord-transcribe/shared';
-
-const pipelineAsync = promisify(pipeline);
 
 /**
  * Processes audio streams from Discord (Opus) to WAV format

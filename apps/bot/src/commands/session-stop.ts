@@ -1,5 +1,4 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
-import { SessionState } from '@discord-transcribe/shared';
 import { Command, CommandContext } from './index';
 import { SessionProcessor } from '../sessions/SessionProcessor';
 

@@ -6,6 +6,7 @@ import * as path from 'path';
 import { AudioProcessor } from './AudioProcessor';
 
 vi.mock('prism-media', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { Transform } = require('stream');
 
   class PassthroughDecoder extends Transform {

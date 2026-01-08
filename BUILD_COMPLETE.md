@@ -19,8 +19,8 @@ The Discord Multi-Track Transcription Bot has been successfully built according 
    - Three consent commands: agree, revoke, status
    - Session validation against consent records
 
-3. **Azure OpenAI Transcription**
-   - Full integration with Azure OpenAI transcription API
+3. **OpenAI Transcription**
+   - Full integration with OpenAI transcription API
    - Support for verbose_json with timestamp granularities
    - Glossary/prompt system for D&D terms
    - Concurrent transcription queue with retry logic
@@ -66,7 +66,7 @@ discord-transcribe-bot/
 │   │   └── package.json
 │   └── worker/              # Transcription worker
 │       ├── src/
-│       │   ├── transcribe/  # Azure OpenAI client
+│       │   ├── transcribe/  # OpenAI client
 │       │   └── merge/       # Timeline merge & formatting
 │       └── package.json
 ├── packages/
@@ -191,7 +191,7 @@ The bot implements pragmatic consent management:
 Per session with 4 speakers for 2 hours:
 - ~480 segments (assuming 30-second average utterances)
 - ~4 hours of actual speech time
-- Azure transcription costs per minute of audio
+- OpenAI transcription costs per minute of audio
 
 The bot uses segment-based recording to minimize transcription costs (only transcribes speech, not silence).
 
@@ -217,4 +217,4 @@ These can be added later if needed.
 
 ## Project Complete
 
-The bot is ready for Discord and Azure setup as described above. All core functionality from the spec has been implemented and builds successfully.
+The bot is ready for Discord and OpenAI setup as described above. All core functionality from the spec has been implemented and builds successfully.

@@ -182,5 +182,5 @@ For production, consider:
 For issues or questions:
 - Check the logs in the console
 - Review Discord bot permissions
-- Verify Azure OpenAI access
+- Verify OpenAI API access
 - See GitHub issues for known problems

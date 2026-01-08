@@ -37,7 +37,7 @@ The Discord Multi-Track Transcription Bot is designed with separation of concern
                     └──────────────────────────────┘
                             │
                     ┌───────▼──────┐
-                    │  Azure OpenAI│
+                    │    OpenAI    │
                     │ Transcription│
                     └──────────────┘
 ```
@@ -65,7 +65,7 @@ The Discord Multi-Track Transcription Bot is designed with separation of concern
 4. `TranscriptionQueue` processes segments with configurable concurrency
 5. For each segment:
    - Builds prompt from glossary
-   - Calls Azure OpenAI `/v1/audio/transcriptions`
+   - Calls OpenAI `/v1/audio/transcriptions`
    - Retries on failure with exponential backoff
 6. Results stored back to segment records
 
@@ -111,7 +111,7 @@ A continuous background stream feeds a ring buffer (last 500ms). When a segment 
 
 ### Glossary Prompt
 
-Azure OpenAI transcription accepts a free-text `prompt` parameter. We use this to inject D&D-specific terms:
+OpenAI transcription accepts a free-text `prompt` parameter. We use this to inject D&D-specific terms:
 
 ```
 "This is a D&D session. Proper nouns: Waterdeep, Strahd, Vecna. Spells: Eldritch Blast. Please preserve capitalization."
@@ -155,7 +155,7 @@ data/
 
 ### Transcription API Failures
 
-**Risk**: Azure API rate limits, outages, or quota exhaustion.
+**Risk**: OpenAI API rate limits, outages, or quota exhaustion.
 
 **Mitigation**:
 - Retry with exponential backoff
@@ -208,7 +208,7 @@ For production scale:
    - Crash recovery via persisted state
 
 3. **Blob storage**
-   - S3/Azure Blob for audio/transcripts
+   - S3/Blob storage for audio/transcripts
    - Signed URLs for sharing
    - CDN for delivery
 
@@ -230,7 +230,7 @@ For production scale:
 - Audio stored locally (not cloud by default)
 - Configurable retention (default: 7 days)
 - Deletion command for immediate removal
-- No audio sent to Azure (only for transcription)
+- No audio sent to OpenAI (only for transcription)
 
 ### API Keys
 
@@ -250,7 +250,7 @@ For production scale:
 ### Integration Tests
 
 - Mock Discord voice streams
-- Mock Azure API responses
+- Mock OpenAI API responses
 - End-to-end segment → transcript flow
 
 ### Manual Tests
@@ -276,4 +276,4 @@ Key metrics to track:
 Recommended tools:
 - Prometheus + Grafana
 - Discord bot dashboard
-- Azure Monitor for API calls
+- OpenAI usage dashboard for API calls

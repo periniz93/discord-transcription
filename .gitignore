@@ -7,3 +7,7 @@ data/
 *.flac
 *.opus
 .DS_Store
+
+# Local setup files (not for repo)
+LOCAL_SETUP.md
+test-data/

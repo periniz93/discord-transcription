@@ -68,6 +68,10 @@ docker compose up --build
 
 This uses the same `.env` file and mounts `./data` into the containers.
 
+## Monitoring
+
+Operational events are written to `./data/metrics.log` as JSON lines.
+
 ## Commands
 
 - `/consent-agree` - Consent to voice recording

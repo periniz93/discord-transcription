@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
 import { Command, CommandContext } from './index';
 import { SessionProcessor } from '../sessions/SessionProcessor';
+import { Telemetry } from '../monitoring/Telemetry';
 
 export const sessionStopCommand: Command = {
   data: new SlashCommandBuilder()
@@ -31,6 +32,10 @@ export const sessionStopCommand: Command = {
     try {
       // Stop the session
       await sessionManager.stopSession(session.sessionId);
+      void Telemetry.record('session_stopped', {
+        sessionId: session.sessionId,
+        guildId,
+      });
 
       const duration = session.endedAt! - session.startedAt;
       const durationMinutes = Math.floor(duration / 60000);
@@ -50,6 +55,11 @@ export const sessionStopCommand: Command = {
       });
     } catch (error) {
       console.error('Error stopping session:', error);
+      void Telemetry.record('session_stop_failed', {
+        sessionId: session.sessionId,
+        guildId,
+        error: error instanceof Error ? error.message : String(error),
+      });
       await interaction.editReply({
         content: 'Failed to stop recording session.',
       });

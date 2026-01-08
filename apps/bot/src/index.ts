@@ -6,6 +6,7 @@ import { ConsentManager } from './sessions/ConsentManager';
 import { StorageManager } from './storage/StorageManager';
 import { SessionPersistence } from './sessions/SessionPersistence';
 import { SessionProcessor } from './sessions/SessionProcessor';
+import { Telemetry } from './monitoring/Telemetry';
 
 // Initialize managers
 const sessionManager = new SessionManager();
@@ -118,6 +119,10 @@ async function start() {
 
   if (recoverableSessions.length > 0) {
     console.log(`Recovering ${recoverableSessions.length} session(s) after restart...`);
+    void Telemetry.record('sessions_recovered', {
+      count: recoverableSessions.length,
+      sessionIds: recoverableSessions.map(session => session.sessionId),
+    });
     const processor = new SessionProcessor(sessionManager, storageManager, client);
 
     for (const session of recoverableSessions) {

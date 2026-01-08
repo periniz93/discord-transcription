@@ -13,6 +13,7 @@ import {
 import { SessionState } from '@discord-transcribe/shared';
 import { Command, CommandContext } from './index';
 import { VoiceRecorder } from '../voice/VoiceRecorder';
+import { Telemetry } from '../monitoring/Telemetry';
 
 export const sessionStartCommand: Command = {
   data: new SlashCommandBuilder()
@@ -117,6 +118,12 @@ export const sessionStartCommand: Command = {
 
       // Update session state
       sessionManager.updateSessionState(session.sessionId, SessionState.RECORDING);
+      void Telemetry.record('session_started', {
+        sessionId: session.sessionId,
+        guildId,
+        voiceChannelId: voiceChannel.id,
+        participantCount: voiceMembers.length,
+      });
 
       // Announce in text channel
       const textChannel = await interaction.client.channels.fetch(interaction.channelId!);
@@ -131,6 +138,11 @@ export const sessionStartCommand: Command = {
       });
     } catch (error) {
       console.error('Error starting session:', error);
+      void Telemetry.record('session_start_failed', {
+        guildId,
+        voiceChannelId: voiceChannel?.id,
+        error: error instanceof Error ? error.message : String(error),
+      });
       await interaction.editReply({
         content: 'Failed to start recording session. Please try again.',
       });

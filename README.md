@@ -1,5 +1,9 @@
 # Discord Multi-Track Transcription Bot
 
+[![Tests](https://img.shields.io/badge/tests-54%20passing-brightgreen)](https://github.com/periniz93/discord-transcription)
+[![Node](https://img.shields.io/badge/node-%3E%3D22.12.0-brightgreen)](https://nodejs.org)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 A Discord bot that records voice channels with per-speaker separation and generates transcripts with speaker attribution using Azure OpenAI.
 
 ## Features
@@ -56,14 +60,43 @@ See `.env.example` for all configuration options.
 - `/glossary-show` - Show current glossary
 - `/session-delete <session_id>` - Delete session data
 
+## Testing
+
+Run the test suite:
+```bash
+npm test
+```
+
+Run tests in watch mode:
+```bash
+npm run test:watch
+```
+
+**Test Coverage:** 54 tests across core functionality
+- RingBuffer (6 tests)
+- SessionManager (15 tests)
+- ConsentManager (12 tests)
+- TimelineMerger (10 tests)
+- TranscriptFormatter (11 tests)
+
 ## Architecture
 
 - `apps/bot` - Discord bot service
 - `apps/worker` - Transcription worker (can run separately)
 - `packages/shared` - Shared types and configuration
 
+See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed technical documentation.
+
 ## Important Notes
 
 - Requires consent from all participants
 - Voice receiving is not officially supported by Discord (use at your own risk)
 - Audio is stored locally and deleted according to retention policy
+
+## Contributing
+
+See [open issues](https://github.com/periniz93/discord-transcription/issues) for planned improvements and enhancements.
+
+## License
+
+MIT

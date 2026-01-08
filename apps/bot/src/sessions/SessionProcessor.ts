@@ -1,4 +1,4 @@
-import { Session, SessionState } from '@discord-transcribe/shared';
+import { Session, SessionState, config } from '@discord-transcribe/shared';
 import { SessionManager } from './SessionManager';
 import { StorageManager } from '../storage/StorageManager';
 import { TranscriptDelivery } from '../storage/TranscriptDelivery';
@@ -61,8 +61,18 @@ export class SessionProcessor {
       // Update state
       this.sessionManager.updateSessionState(sessionId, SessionState.DELIVERING);
 
-      // Deliver to Discord
-      await this.transcriptDelivery.deliver(session, markdownPath, jsonPath, srtPath);
+      // Deliver to Discord (if enabled)
+      if (config.delivery.discordEnabled) {
+        await this.transcriptDelivery.deliver(session, markdownPath, jsonPath, srtPath);
+        console.log(`Transcript delivered to Discord for session ${sessionId}`);
+      } else {
+        console.log(`Discord delivery disabled. Transcripts saved to disk:`);
+        console.log(`  - Markdown: ${markdownPath}`);
+        console.log(`  - JSON: ${jsonPath}`);
+        if (srtPath) {
+          console.log(`  - SRT: ${srtPath}`);
+        }
+      }
 
       // Mark as complete
       this.sessionManager.updateSessionState(sessionId, SessionState.IDLE);

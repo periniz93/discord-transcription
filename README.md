@@ -48,6 +48,16 @@ npm run bot
 
 See `.env.example` for all configuration options.
 
+### External Service Integration
+
+To use transcripts with an external service instead of posting to Discord:
+
+```env
+DISCORD_DELIVERY_ENABLED=false
+```
+
+Transcripts will be saved to `./data/transcripts/<session-id>/` without being posted to Discord.
+
 ## Commands
 
 - `/consent-agree` - Consent to voice recording

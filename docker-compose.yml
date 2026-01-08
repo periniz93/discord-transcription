@@ -1,0 +1,22 @@
+services:
+  bot:
+    build: .
+    command: npm run bot
+    env_file:
+      - .env
+    environment:
+      DATA_DIR: /data
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+
+  worker:
+    build: .
+    command: npm run worker
+    env_file:
+      - .env
+    environment:
+      DATA_DIR: /data
+    volumes:
+      - ./data:/data
+    restart: unless-stopped

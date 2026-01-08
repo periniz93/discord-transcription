@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
+import { formatDuration } from '@discord-transcribe/shared';
 import { Command, CommandContext } from './index';
 import { SessionProcessor } from '../sessions/SessionProcessor';
 import { Telemetry } from '../monitoring/Telemetry';
@@ -38,14 +39,13 @@ export const sessionStopCommand: Command = {
       });
 
       const duration = session.endedAt! - session.startedAt;
-      const durationMinutes = Math.floor(duration / 60000);
-      const durationSeconds = Math.floor((duration % 60000) / 1000);
+      const durationLabel = formatDuration(duration);
 
       const segments = sessionManager.getSegments(session.sessionId);
       const participantCount = session.participants.size;
 
       await interaction.editReply({
-        content: `Recording stopped!\n\nSession ID: \`${session.sessionId}\`\nDuration: ${durationMinutes}m ${durationSeconds}s\nParticipants: ${participantCount}\nSegments captured: ${segments.length}\n\nTranscription starting...`,
+        content: `Recording stopped!\n\nSession ID: \`${session.sessionId}\`\nDuration: ${durationLabel}\nParticipants: ${participantCount}\nSegments captured: ${segments.length}\n\nTranscription starting...`,
       });
 
       // Process session asynchronously

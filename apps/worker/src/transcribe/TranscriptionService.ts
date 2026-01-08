@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import FormData from 'form-data';
 import { createReadStream } from 'fs';
-import { config } from '@discord-transcribe/shared';
+import { buildGlossaryPrompt, config } from '@discord-transcribe/shared';
 
 export interface TranscriptionResult {
   text: string;
@@ -104,12 +104,7 @@ export class TranscriptionService {
    * @param glossary Array of terms to include in the prompt
    */
   buildPrompt(glossary: string[]): string {
-    if (glossary.length === 0) {
-      return 'This is a D&D session. Please preserve capitalization of proper nouns and spell names.';
-    }
-
-    const terms = glossary.slice(0, 200).join(', ');
-    return `This is a D&D session. Proper nouns and terms: ${terms}. Please preserve capitalization.`;
+    return buildGlossaryPrompt(glossary);
   }
 
   private parseRetryAfterMs(headers?: Record<string, string>): number | undefined {

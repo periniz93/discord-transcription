@@ -3,6 +3,7 @@ import { VoiceConnection } from '@discordjs/voice';
 import { v4 as uuidv4 } from 'uuid';
 
 export class SessionManager {
+  private static readonly MAX_GLOSSARY_TERM_LENGTH = 80;
   private sessions: Map<string, Session> = new Map();
   private voiceConnections: Map<string, VoiceConnection> = new Map();
   private segments: Map<string, Segment[]> = new Map(); // sessionId -> segments
@@ -69,13 +70,43 @@ export class SessionManager {
     }
   }
 
-  addGlossaryTerm(sessionId: string, term: string): void {
-    const session = this.sessions.get(sessionId);
-    if (session) {
-      if (!session.glossary.includes(term)) {
-        session.glossary.push(term);
-      }
+  static normalizeGlossaryTerm(term: string): string | null {
+    const cleaned = term
+      .replace(/[\u0000-\u001F\u007F]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (!cleaned) {
+      return null;
     }
+
+    if (cleaned.length > SessionManager.MAX_GLOSSARY_TERM_LENGTH) {
+      return null;
+    }
+
+    return cleaned;
+  }
+
+  addGlossaryTerm(sessionId: string, term: string): {
+    status: 'added' | 'duplicate' | 'invalid';
+    term?: string;
+  } {
+    const session = this.sessions.get(sessionId);
+    if (!session) {
+      return { status: 'invalid' };
+    }
+
+    const normalized = SessionManager.normalizeGlossaryTerm(term);
+    if (!normalized) {
+      return { status: 'invalid' };
+    }
+
+    if (session.glossary.includes(normalized)) {
+      return { status: 'duplicate', term: normalized };
+    }
+
+    session.glossary.push(normalized);
+    return { status: 'added', term: normalized };
   }
 
   getGlossary(sessionId: string): string[] {

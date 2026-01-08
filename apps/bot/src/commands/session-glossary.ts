@@ -31,15 +31,71 @@ const glossaryAddCommand: Command = {
     }
 
     const termsInput = interaction.options.getString('terms', true);
-    const terms = termsInput.split(',').map(t => t.trim()).filter(t => t.length > 0);
+    const rawTerms = termsInput.split(',').map(t => t.trim()).filter(t => t.length > 0);
 
-    for (const term of terms) {
-      sessionManager.addGlossaryTerm(session.sessionId, term);
+    const addedTerms: string[] = [];
+    const duplicateTerms: string[] = [];
+    const invalidTerms: string[] = [];
+
+    const clipTerm = (term: string, maxLength: number) => {
+      if (term.length <= maxLength) {
+        return term;
+      }
+      return `${term.slice(0, maxLength - 3)}...`;
+    };
+
+    for (const term of rawTerms) {
+      const result = sessionManager.addGlossaryTerm(session.sessionId, term);
+      if (result.status === 'added' && result.term) {
+        addedTerms.push(result.term);
+      } else if (result.status === 'duplicate' && result.term) {
+        duplicateTerms.push(result.term);
+      } else {
+        invalidTerms.push(clipTerm(term, 80));
+      }
+    }
+
+    if (rawTerms.length === 0) {
+      await interaction.reply({
+        content: 'No valid terms found. Provide a comma-separated list of terms.',
+        ephemeral: true,
+      });
+      return;
+    }
+
+    const formatList = (terms: string[]) => {
+      const maxDisplay = 10;
+      const displayTerms = terms.slice(0, maxDisplay);
+      const remaining = terms.length - displayTerms.length;
+      let content = displayTerms.join(', ');
+
+      if (remaining > 0) {
+        content += `, ...and ${remaining} more`;
+      }
+
+      return content;
+    };
+
+    const responseParts: string[] = [];
+
+    if (addedTerms.length > 0) {
+      responseParts.push(`Added ${addedTerms.length} term(s): ${formatList(addedTerms)}`);
+    }
+
+    if (duplicateTerms.length > 0) {
+      responseParts.push(`Ignored ${duplicateTerms.length} duplicate(s): ${formatList(duplicateTerms)}`);
+    }
+
+    if (invalidTerms.length > 0) {
+      responseParts.push(
+        `Rejected ${invalidTerms.length} invalid term(s) (empty or too long): ${formatList(invalidTerms)}`
+      );
     }
 
     await interaction.reply({
-      content: `Added ${terms.length} term(s) to the glossary: ${terms.join(', ')}`,
+      content: responseParts.join('\n'),
       ephemeral: true,
+      allowedMentions: { parse: [] },
     });
   },
 };

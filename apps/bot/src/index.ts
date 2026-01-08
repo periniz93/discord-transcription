@@ -1,5 +1,5 @@
 import { Client, GatewayIntentBits, Events, REST, Routes } from 'discord.js';
-import { config } from '@discord-transcribe/shared';
+import { config, validateConfig } from '@discord-transcribe/shared';
 import { commands } from './commands';
 import { SessionManager } from './sessions/SessionManager';
 import { ConsentManager } from './sessions/ConsentManager';
@@ -76,13 +76,12 @@ client.once(Events.ClientReady, (c) => {
 // Start the bot
 async function start() {
   // Validate config
-  if (!config.discord.token || !config.discord.clientId) {
-    console.error('Missing required Discord configuration. Please check your .env file.');
-    process.exit(1);
-  }
-
-  if (!config.openai.apiKey) {
-    console.error('Missing required OpenAI configuration. Please check your .env file.');
+  const configErrors = validateConfig();
+  if (configErrors.length > 0) {
+    console.error('Configuration validation failed:');
+    for (const error of configErrors) {
+      console.error(`- ${error}`);
+    }
     process.exit(1);
   }
 

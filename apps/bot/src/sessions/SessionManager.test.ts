@@ -100,6 +100,23 @@ describe('SessionManager', () => {
       expect(session.glossary.filter(t => t === 'Waterdeep').length).toBe(1);
     });
 
+    it('should normalize whitespace in glossary terms', () => {
+      const session = sessionManager.createSession('guild1', 'voice1', 'text1');
+      sessionManager.addGlossaryTerm(session.sessionId, '  Eldritch   Blast  ');
+
+      expect(session.glossary).toEqual(['Eldritch Blast']);
+    });
+
+    it('should reject overly long glossary terms', () => {
+      const session = sessionManager.createSession('guild1', 'voice1', 'text1');
+      const longTerm = 'a'.repeat(81);
+
+      const result = sessionManager.addGlossaryTerm(session.sessionId, longTerm);
+
+      expect(result.status).toBe('invalid');
+      expect(session.glossary).toEqual([]);
+    });
+
     it('should retrieve glossary', () => {
       const session = sessionManager.createSession('guild1', 'voice1', 'text1');
       sessionManager.addGlossaryTerm(session.sessionId, 'Eldritch Blast');

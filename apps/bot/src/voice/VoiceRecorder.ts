@@ -11,6 +11,7 @@ import { AudioProcessor } from './AudioProcessor';
 import { RingBuffer } from './RingBuffer';
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
+import { promises as fs } from 'fs';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
 
@@ -50,6 +51,9 @@ export class VoiceRecorder {
     this.receiver.speaking.on('start', (userId) => {
       this.handleSpeakingStart(userId);
     });
+    this.receiver.speaking.on('error', (error: Error) => {
+      console.error('Voice receiver speaking error:', error);
+    });
 
     // Start continuous listening for ring buffers
     this.startContinuousListening();
@@ -85,6 +89,10 @@ export class VoiceRecorder {
       end: {
         behavior: EndBehaviorType.Manual, // Never auto-end
       },
+    });
+    continuousStream.on('error', (error: Error) => {
+      console.error(`Ring buffer stream error for user ${userId}:`, error);
+      this.ringBuffers.delete(userId);
     });
 
     // Decode and feed to ring buffer
@@ -163,6 +171,9 @@ export class VoiceRecorder {
         duration: config.audio.silenceDurationMs,
       },
     });
+    audioStream.on('error', (error: Error) => {
+      console.error(`Audio stream error for user ${userId}:`, error);
+    });
 
     try {
       // Process and save audio
@@ -192,6 +203,7 @@ export class VoiceRecorder {
       );
     } catch (error) {
       console.error(`Error processing audio for segment ${segmentId}:`, error);
+      await fs.rm(filePath, { force: true });
     } finally {
       // Remove from active segments
       this.activeSegments.delete(userId);

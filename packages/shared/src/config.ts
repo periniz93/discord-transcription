@@ -27,6 +27,9 @@ export interface Config {
     dataDir: string;
     retentionDays: number;
   };
+  delivery: {
+    discordEnabled: boolean;
+  };
 }
 
 export const config: Config = {
@@ -54,5 +57,8 @@ export const config: Config = {
   storage: {
     dataDir: process.env.DATA_DIR || './data',
     retentionDays: parseInt(process.env.RETENTION_DAYS || '7'),
+  },
+  delivery: {
+    discordEnabled: process.env.DISCORD_DELIVERY_ENABLED !== 'false', // Default true for backward compatibility
   },
 };

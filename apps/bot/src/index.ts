@@ -81,8 +81,8 @@ async function start() {
     process.exit(1);
   }
 
-  if (!config.azure.endpoint || !config.azure.apiKey) {
-    console.error('Missing required Azure configuration. Please check your .env file.');
+  if (!config.openai.apiKey) {
+    console.error('Missing required OpenAI configuration. Please check your .env file.');
     process.exit(1);
   }
 

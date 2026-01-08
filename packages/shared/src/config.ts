@@ -6,10 +6,8 @@ export interface Config {
     token: string;
     clientId: string;
   };
-  azure: {
-    endpoint: string;
+  openai: {
     apiKey: string;
-    apiVersion: string;
     model: string;
   };
   audio: {
@@ -36,11 +34,9 @@ export const config: Config = {
     token: process.env.DISCORD_TOKEN || '',
     clientId: process.env.DISCORD_CLIENT_ID || '',
   },
-  azure: {
-    endpoint: process.env.AZURE_ENDPOINT || '',
-    apiKey: process.env.AZURE_API_KEY || '',
-    apiVersion: process.env.AZURE_API_VERSION || '2024-06-01',
-    model: process.env.AZURE_MODEL || 'gpt-4o-transcribe',
+  openai: {
+    apiKey: process.env.OPENAI_API_KEY || '',
+    model: process.env.OPENAI_MODEL || 'whisper-1',
   },
   audio: {
     format: 'wav',

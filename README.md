@@ -4,13 +4,13 @@
 [![Node](https://img.shields.io/badge/node-%3E%3D22.12.0-brightgreen)](https://nodejs.org)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-A Discord bot that records voice channels with per-speaker separation and generates transcripts with speaker attribution using Azure OpenAI.
+A Discord bot that records voice channels with per-speaker separation and generates transcripts with speaker attribution using OpenAI Whisper.
 
 ## Features
 
 - Multi-track voice recording (separate audio per speaker)
 - Automatic segmentation based on speech pauses
-- Azure OpenAI Whisper transcription with custom glossary support
+- OpenAI Whisper transcription with custom glossary support
 - Speaker-attributed transcripts in Markdown and JSON formats
 - Consent management and privacy controls
 - Configurable retention policies
@@ -19,7 +19,7 @@ A Discord bot that records voice channels with per-speaker separation and genera
 
 - Node.js 22.12.0 or higher
 - Discord bot with proper permissions
-- Azure OpenAI endpoint with transcription model access
+- OpenAI API key with access to Whisper API
 
 ## Setup
 

@@ -127,18 +127,17 @@ To deploy the bot, you need to:
      - Speak (voice)
    - Invite bot to your server using OAuth2 URL
 
-2. **Azure OpenAI Setup**
-   - Access Azure OpenAI resource
-   - Note endpoint URL (e.g., `https://your-resource.openai.azure.com`)
-   - Copy API key from "Keys and Endpoint"
-   - Ensure access to `gpt-4o-transcribe` model
+2. **OpenAI API Setup**
+   - Go to https://platform.openai.com/api-keys
+   - Create new API key
+   - Copy the key (starts with `sk-`)
+   - Ensure you have Whisper API access (included with all accounts)
 
 3. **Configuration**
    - Copy `.env.example` to `.env`
    - Fill in `DISCORD_TOKEN` with your bot token
    - Fill in `DISCORD_CLIENT_ID` with your client ID
-   - Fill in `AZURE_ENDPOINT` with your Azure endpoint
-   - Fill in `AZURE_API_KEY` with your Azure API key
+   - Fill in `OPENAI_API_KEY` with your OpenAI API key
 
 4. **Run the Bot**
    ```bash

@@ -6,7 +6,7 @@ This guide walks you through setting up the Discord Multi-Track Transcription Bo
 
 1. Node.js 22.12.0 or higher
 2. Discord bot application
-3. Azure OpenAI endpoint with transcription access
+3. OpenAI API key with Whisper API access
 
 ## Step 1: Discord Bot Setup
 
@@ -27,13 +27,14 @@ This guide walks you through setting up the Discord Multi-Track Transcription Bo
      - Speak (voice)
    - Copy the generated URL and use it to invite the bot to your server
 
-## Step 2: Azure OpenAI Setup
+## Step 2: OpenAI API Setup
 
-1. Go to [Azure Portal](https://portal.azure.com)
-2. Create or access your Azure OpenAI resource
-3. Note your endpoint URL (e.g., `https://your-resource.openai.azure.com`)
-4. Go to "Keys and Endpoint" to get your API key
-5. Ensure you have access to `gpt-4o-transcribe` model deployment
+1. Go to [OpenAI Platform](https://platform.openai.com)
+2. Sign in or create an account
+3. Navigate to [API Keys](https://platform.openai.com/api-keys)
+4. Click "Create new secret key"
+5. Copy your API key (starts with `sk-`)
+6. Note: You need access to the Whisper API (available on all OpenAI accounts)
 
 ## Step 3: Installation
 
@@ -57,10 +58,8 @@ cp .env.example .env
 DISCORD_TOKEN=your_discord_bot_token_here
 DISCORD_CLIENT_ID=your_discord_client_id_here
 
-AZURE_ENDPOINT=https://your-resource.openai.azure.com
-AZURE_API_KEY=your_azure_api_key_here
-AZURE_API_VERSION=2024-06-01
-AZURE_MODEL=gpt-4o-transcribe
+OPENAI_API_KEY=sk-your_openai_api_key_here
+OPENAI_MODEL=whisper-1
 ```
 
 ## Step 4: Build
@@ -112,10 +111,11 @@ Ready! Logged in as YourBot#1234
 - Verify you're in a voice channel when running `/session start`
 
 ### Transcription fails
-- Verify Azure credentials in `.env`
-- Check Azure OpenAI endpoint is correct
-- Ensure you have quota/access to transcription API
+- Verify OpenAI API key in `.env`
+- Check that API key is valid and not expired
+- Ensure you have credits/quota on your OpenAI account
 - Check bot logs for specific error messages
+- Verify you have access to Whisper API
 
 ### "Missing required configuration"
 - Double-check all fields in `.env` are filled

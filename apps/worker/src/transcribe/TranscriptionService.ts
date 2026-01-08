@@ -29,20 +29,17 @@ export interface TranscriptionWord {
 }
 
 export class TranscriptionService {
-  private endpoint: string;
   private apiKey: string;
-  private apiVersion: string;
   private model: string;
+  private endpoint: string = 'https://api.openai.com/v1/audio/transcriptions';
 
   constructor() {
-    this.endpoint = config.azure.endpoint;
-    this.apiKey = config.azure.apiKey;
-    this.apiVersion = config.azure.apiVersion;
-    this.model = config.azure.model;
+    this.apiKey = config.openai.apiKey;
+    this.model = config.openai.model;
   }
 
   /**
-   * Transcribe an audio file using Azure OpenAI
+   * Transcribe an audio file using OpenAI Whisper API
    * @param audioPath Path to the audio file
    * @param prompt Optional prompt with glossary terms
    * @param timestampGranularities Timestamp granularities to request
@@ -52,8 +49,6 @@ export class TranscriptionService {
     prompt?: string,
     timestampGranularities: ('segment' | 'word')[] = ['segment']
   ): Promise<TranscriptionResult> {
-    const url = `${this.endpoint}/openai/v1/audio/transcriptions?api-version=${this.apiVersion}`;
-
     const formData = new FormData();
     formData.append('file', createReadStream(audioPath));
     formData.append('model', this.model);
@@ -65,10 +60,10 @@ export class TranscriptionService {
     }
 
     try {
-      const response = await axios.post(url, formData, {
+      const response = await axios.post(this.endpoint, formData, {
         headers: {
           ...formData.getHeaders(),
-          'api-key': this.apiKey,
+          'Authorization': `Bearer ${this.apiKey}`,
         },
         timeout: 120000, // 2 minutes
       });

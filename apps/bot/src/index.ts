@@ -1,9 +1,11 @@
 import { Client, GatewayIntentBits, Events, REST, Routes } from 'discord.js';
-import { config, validateConfig } from '@discord-transcribe/shared';
+import { config, validateConfig, SessionState } from '@discord-transcribe/shared';
 import { commands } from './commands';
 import { SessionManager } from './sessions/SessionManager';
 import { ConsentManager } from './sessions/ConsentManager';
 import { StorageManager } from './storage/StorageManager';
+import { SessionPersistence } from './sessions/SessionPersistence';
+import { SessionProcessor } from './sessions/SessionProcessor';
 
 // Initialize managers
 const sessionManager = new SessionManager();
@@ -91,6 +93,10 @@ async function start() {
   // Initialize consent manager
   await consentManager.initialize();
 
+  // Initialize session persistence and load any recovered sessions
+  const sessionPersistence = new SessionPersistence(storageManager);
+  await sessionManager.loadFromPersistence(sessionPersistence);
+
   // Register commands
   await registerCommands();
 
@@ -102,6 +108,24 @@ async function start() {
 
   // Login to Discord
   await client.login(config.discord.token);
+
+  const recoverableSessions = sessionManager
+    .getAllSessions()
+    .filter(
+      session =>
+        session.state === SessionState.STOPPING || session.state === SessionState.TRANSCRIBING,
+    );
+
+  if (recoverableSessions.length > 0) {
+    console.log(`Recovering ${recoverableSessions.length} session(s) after restart...`);
+    const processor = new SessionProcessor(sessionManager, storageManager, client);
+
+    for (const session of recoverableSessions) {
+      processor.processSession(session.sessionId).catch(error => {
+        console.error(`Error recovering session ${session.sessionId}:`, error);
+      });
+    }
+  }
 }
 
 start().catch(console.error);

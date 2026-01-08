@@ -23,6 +23,10 @@ export class StorageManager {
     return path.join(this.dataDir, 'sessions', sessionId);
   }
 
+  getSessionsRootDir(): string {
+    return path.join(this.dataDir, 'sessions');
+  }
+
   getSegmentDir(sessionId: string): string {
     return path.join(this.dataDir, 'segments', sessionId);
   }

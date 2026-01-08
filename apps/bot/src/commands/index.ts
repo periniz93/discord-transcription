@@ -19,7 +19,7 @@ export interface CommandContext {
 }
 
 export interface Command {
-  data: SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'> | any;
+  data: SlashCommandBuilder;
   execute: (interaction: ChatInputCommandInteraction, context: CommandContext) => Promise<void>;
 }
 

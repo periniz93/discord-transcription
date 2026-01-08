@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import FormData from 'form-data';
 import { createReadStream } from 'fs';
-import { config, Segment } from '@discord-transcribe/shared';
+import { config } from '@discord-transcribe/shared';
 
 export interface TranscriptionResult {
   text: string;
@@ -26,6 +26,19 @@ export interface TranscriptionWord {
   word: string;
   start: number;
   end: number;
+}
+
+export class TranscriptionError extends Error {
+  status?: number;
+  retryAfterMs?: number;
+  isRateLimit?: boolean;
+
+  constructor(message: string, status?: number, retryAfterMs?: number, isRateLimit?: boolean) {
+    super(message);
+    this.status = status;
+    this.retryAfterMs = retryAfterMs;
+    this.isRateLimit = isRateLimit;
+  }
 }
 
 export class TranscriptionService {
@@ -76,9 +89,11 @@ export class TranscriptionService {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError;
-        throw new Error(
-          `Transcription failed: ${axiosError.response?.status} - ${JSON.stringify(axiosError.response?.data)}`
-        );
+        const status = axiosError.response?.status;
+        const retryAfterMs = this.parseRetryAfterMs(axiosError.response?.headers);
+        const message = `Transcription failed: ${status} - ${JSON.stringify(axiosError.response?.data)}`;
+
+        throw new TranscriptionError(message, status, retryAfterMs, status === 429);
       }
       throw error;
     }
@@ -95,5 +110,36 @@ export class TranscriptionService {
 
     const terms = glossary.slice(0, 200).join(', ');
     return `This is a D&D session. Proper nouns and terms: ${terms}. Please preserve capitalization.`;
+  }
+
+  private parseRetryAfterMs(headers?: Record<string, string>): number | undefined {
+    if (!headers) {
+      return undefined;
+    }
+
+    const retryAfter = headers['retry-after'];
+    if (retryAfter) {
+      const seconds = Number(retryAfter);
+      if (!Number.isNaN(seconds)) {
+        return Math.max(0, Math.round(seconds * 1000));
+      }
+
+      const dateMs = Date.parse(retryAfter);
+      if (!Number.isNaN(dateMs)) {
+        return Math.max(0, dateMs - Date.now());
+      }
+    }
+
+    const resetRequests = headers['x-ratelimit-reset-requests'];
+    if (resetRequests) {
+      const match = resetRequests.match(/^(\d+(\.\d+)?)(ms|s)?$/);
+      if (match) {
+        const value = Number(match[1]);
+        const unit = match[3] || 's';
+        return Math.max(0, Math.round(unit === 'ms' ? value : value * 1000));
+      }
+    }
+
+    return undefined;
   }
 }

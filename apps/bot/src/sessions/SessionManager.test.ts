@@ -54,7 +54,7 @@ describe('SessionManager', () => {
     });
 
     it('should not retrieve non-recording sessions', () => {
-      const session = sessionManager.createSession('guild1', 'voice1', 'text1');
+      sessionManager.createSession('guild1', 'voice1', 'text1');
       // State is IDLE
 
       const retrieved = sessionManager.getSessionByGuild('guild1');

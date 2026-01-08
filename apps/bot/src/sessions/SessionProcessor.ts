@@ -1,4 +1,4 @@
-import { Session, SessionState, config } from '@discord-transcribe/shared';
+import { SessionState, config } from '@discord-transcribe/shared';
 import { SessionManager } from './SessionManager';
 import { StorageManager } from '../storage/StorageManager';
 import { TranscriptDelivery } from '../storage/TranscriptDelivery';

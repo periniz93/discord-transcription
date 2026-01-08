@@ -1,7 +1,5 @@
 import { TranscriptionJob, config } from '@discord-transcribe/shared';
-import { TranscriptionService } from './TranscriptionService';
-import { promises as fs } from 'fs';
-import * as path from 'path';
+import { TranscriptionService, TranscriptionError, TranscriptionResult } from './TranscriptionService';
 
 export class TranscriptionQueue {
   private service: TranscriptionService;
@@ -10,6 +8,7 @@ export class TranscriptionQueue {
   private maxConcurrency: number;
   private maxRetries: number;
   private retryDelayMs: number;
+  private rateLimitUntilMs: number = 0;
 
   constructor() {
     this.service = new TranscriptionService();
@@ -44,7 +43,7 @@ export class TranscriptionQueue {
   }
 
   private async worker(results: Map<string, string>, prompt?: string): Promise<void> {
-    while (true) {
+    while (this.queue.length > 0) {
       const job = this.queue.shift();
       if (!job) {
         break;
@@ -86,18 +85,47 @@ export class TranscriptionQueue {
     audioPath: string,
     prompt?: string,
     attempt: number = 0
-  ): Promise<any> {
+  ): Promise<TranscriptionResult> {
     try {
+      await this.waitForRateLimit();
       return await this.service.transcribe(audioPath, prompt);
     } catch (error) {
-      if (attempt < this.maxRetries - 1) {
-        const delay = this.retryDelayMs * Math.pow(2, attempt);
+      const delay = this.getRetryDelayMs(error, attempt);
+      if (delay !== null && attempt < this.maxRetries - 1) {
         console.log(`Retry attempt ${attempt + 1} after ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await this.sleep(delay);
         return this.transcribeWithRetry(audioPath, prompt, attempt + 1);
       }
       throw error;
     }
+  }
+
+  private async waitForRateLimit(): Promise<void> {
+    const now = Date.now();
+    if (now < this.rateLimitUntilMs) {
+      await this.sleep(this.rateLimitUntilMs - now);
+    }
+  }
+
+  private getRetryDelayMs(error: unknown, attempt: number): number | null {
+    const baseDelay = this.retryDelayMs * Math.pow(2, attempt);
+
+    if (error instanceof TranscriptionError) {
+      if (error.retryAfterMs && error.retryAfterMs > 0) {
+        this.rateLimitUntilMs = Math.max(this.rateLimitUntilMs, Date.now() + error.retryAfterMs);
+        return error.retryAfterMs;
+      }
+
+      if (error.isRateLimit || (error.status && error.status >= 500)) {
+        return baseDelay;
+      }
+    }
+
+    return baseDelay;
+  }
+
+  private async sleep(durationMs: number): Promise<void> {
+    await new Promise(resolve => setTimeout(resolve, durationMs));
   }
 
   /**

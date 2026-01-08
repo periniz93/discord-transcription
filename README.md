@@ -58,6 +58,16 @@ DISCORD_DELIVERY_ENABLED=false
 
 Transcripts will be saved to `./data/transcripts/<session-id>/` without being posted to Discord.
 
+## Docker
+
+Build and run both the bot and worker:
+
+```bash
+docker compose up --build
+```
+
+This uses the same `.env` file and mounts `./data` into the containers.
+
 ## Commands
 
 - `/consent-agree` - Consent to voice recording

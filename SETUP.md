@@ -103,6 +103,10 @@ Ready! Logged in as YourBot#1234
 - `/glossary-show` - View glossary
 - `/session-delete <session_id>` - Delete session data
 
+### Glossary Examples
+
+Use `docs/example-glossary.md` for a starter list you can paste into `/glossary-add`.
+
 ## Troubleshooting
 
 ### Bot doesn't join voice channel
